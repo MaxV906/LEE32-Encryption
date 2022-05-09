@@ -1,11 +1,10 @@
-# LEE32 Encryption
-
+import sys
 import random
 import json
 
 def getRandomValues():
 
-    values = "yxcvbnmasdfghjklqwertzuiopYXCVBNMASDFGHJKLQWERTZUIOP1234567890*?!#$%&/´"
+    values = "yxcvbnmasdfghjklqwertzuiopYXCVBNMASDFGHJKLQWERTZUIOP1234567890"
 
     random_values = []
 
@@ -28,16 +27,6 @@ def get_encryption_key():
     for val in values:
 
         encryption_key += val
-
-    f = open("encryption_key.txt", "w")
-
-    f.write(encryption_key)
-
-    f.close()
-
-    print("Encryption key saved!")
-
-    print(f"\nYour encryption key is: {encryption_key}\n")
 
     return encryption_key
 
@@ -211,40 +200,55 @@ def decrypt(encrypted_string, encryption_key):
             
     return new_string
 
-encryption_key = get_encryption_key()
+def __main__():
 
-while True:
+    key = "mGDrP6wNjp7ktezMaO5BXJycVQEA1SgY"
 
-    option = input("1) Encrypt\n2) Generate new encryption key\n3) Decrypt\n4) Change encryption key\n5) Exit\n\nChoose an option: ")
+    args = sys.argv
+    args.pop(0)
 
-    if option == "1":
+    if len(args) != 0:
 
-        input_string = input("String you want to encrypt: ")
+        operation = "encrypt"
+        done = False
+        
+        while done == False:
 
-        encrypted_string = encrypt(input_string, encryption_key)
+            for i in range(0, len(args)):
 
-        print(f"\nEncrypted: {encrypted_string}\n")
+                if args[i] == "-d":
+                    args.remove(args[i])
+                    operation = "decrypt"
+                    break
 
-    elif option == "2":
+                elif args[i] == "-k":
+                    key = args[i + 1]
+                    args.remove(args[i])
+                    args.remove(args[i])
+                    break
 
-        encryption_key = get_encryption_key()
+                elif args[i] == "-g":
+                    operation = None
+                    key = get_encryption_key()
+                    print(key)
+                    done = True
 
-    elif option == "3":
+                elif args[i] == "-h":
+                    operation = None
+                    print("Usage: lee32 [message] [options]\n\nOptions:\n\n-k - Use custom encryption key\n-d - decrypt the message\n-g - generate an encryption key")
+                    done = True
 
-        encrypted_string = input("Encrypted string: ")
+                elif i >= len(args) - 1:
+                    done = True
 
-        decrypted_string = decrypt(encrypted_string, encryption_key)
+        if operation == "encrypt":
+            print(encrypt(" ".join(args), key))
 
-        print(f"Decrypted string: {decrypted_string}\n")
+        elif operation == "decrypt":
+            print(decrypt(" ".join(args), key))
 
-    elif option == "4":
+    else:
+        print("Usage: lee32 [message] [options]\n\nOptions:\n\n-k - Use custom encryption key\n-d - decrypt the message\n-g - generate an encryption key")
 
-        encryption_key = input("New encryption key: ")
 
-    elif option == "5":
-    
-        break
-
-    else: 
-
-        print("Please choose a valid option\n")
+__main__()
